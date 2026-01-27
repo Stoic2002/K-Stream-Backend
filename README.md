@@ -33,19 +33,6 @@ Backend API untuk aplikasi streaming drakor menggunakan Golang + Gin + PostgreSQ
    go run cmd/api/main.go
    ```
 
-## API Endpoints
-
-### Health Check
-- `GET /health` - Check server status
-
-### Auth (Phase 4)
-- `POST /api/auth/register`
-- `POST /api/auth/login`
-- `GET /api/auth/me`
-- `PUT /api/auth/profile`
-
-### More endpoints coming in future phases...
-
 ## Project Structure
 
 ```
