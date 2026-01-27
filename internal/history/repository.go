@@ -31,12 +31,12 @@ func (r *repository) Upsert(ctx context.Context, userID, episodeID string, progr
 	// Logic: Try update, if no rows updated, then insert.
 	// Or use ON CONFLICT (user_id, episode_id) DO UPDATE
 	query := `
-		INSERT INTO watch_history (user_id, episode_id, progress_seconds, is_finished, last_watched_at)
+		INSERT INTO watch_history (user_id, episode_id, progress_seconds, completed, last_watched_at)
 		VALUES ($1, $2, $3, $4, $5)
 		ON CONFLICT (user_id, episode_id) 
 		DO UPDATE SET 
 			progress_seconds = EXCLUDED.progress_seconds,
-			is_finished = EXCLUDED.is_finished,
+			completed = EXCLUDED.completed,
 			last_watched_at = EXCLUDED.last_watched_at
 	`
 	_, err := db.Exec(ctx, query, userID, episodeID, progress, isFinished, time.Now())
@@ -57,7 +57,7 @@ func (r *repository) GetByUser(ctx context.Context, userID string, limit, offset
 
 	// Fetch with episode detail
 	query := `
-		SELECT wh.id, wh.user_id, wh.episode_id, wh.progress_seconds, wh.is_finished, wh.last_watched_at,
+		SELECT wh.id, wh.user_id, wh.episode_id, wh.progress_seconds, wh.completed, wh.last_watched_at,
 		       e.id, e.season_id, e.episode_number, e.title, e.thumbnail_url, e.duration
 		FROM watch_history wh
 		JOIN episodes e ON wh.episode_id = e.id
@@ -100,7 +100,7 @@ func (r *repository) GetByEpisode(ctx context.Context, userID, episodeID string)
 	}
 
 	query := `
-		SELECT id, user_id, episode_id, progress_seconds, is_finished, last_watched_at
+		SELECT id, user_id, episode_id, progress_seconds, completed, last_watched_at
 		FROM watch_history
 		WHERE user_id = $1 AND episode_id = $2
 	`
