@@ -20,8 +20,9 @@ func NewHandler(service Service) *Handler {
 func (h *Handler) GetAll(c *gin.Context) {
 	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
 	limit, _ := strconv.Atoi(c.DefaultQuery("limit", "20"))
+	search := c.Query("search")
 
-	actors, total, err := h.service.GetAll(c.Request.Context(), page, limit)
+	actors, total, err := h.service.GetAll(c.Request.Context(), page, limit, search)
 	if err != nil {
 		response.InternalError(c, "Failed to fetch actors", err.Error())
 		return

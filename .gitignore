@@ -33,3 +33,6 @@ Thumbs.db
 
 # Logs
 *.log
+
+api
+API_DOCS.md

@@ -6,7 +6,7 @@ import (
 )
 
 type Service interface {
-	GetAll(ctx context.Context, page, limit int) ([]Actor, int64, error)
+	GetAll(ctx context.Context, page, limit int, search string) ([]Actor, int64, error)
 	GetByID(ctx context.Context, id string) (*Actor, error)
 	Create(ctx context.Context, req CreateActorRequest) (*Actor, error)
 	Update(ctx context.Context, id string, req UpdateActorRequest) (*Actor, error)
@@ -21,7 +21,7 @@ func NewService(repo Repository) Service {
 	return &service{repo: repo}
 }
 
-func (s *service) GetAll(ctx context.Context, page, limit int) ([]Actor, int64, error) {
+func (s *service) GetAll(ctx context.Context, page, limit int, search string) ([]Actor, int64, error) {
 	if page < 1 {
 		page = 1
 	}
@@ -29,7 +29,7 @@ func (s *service) GetAll(ctx context.Context, page, limit int) ([]Actor, int64, 
 		limit = 20
 	}
 	offset := (page - 1) * limit
-	return s.repo.FindAll(ctx, limit, offset)
+	return s.repo.FindAll(ctx, limit, offset, search)
 }
 
 func (s *service) GetByID(ctx context.Context, id string) (*Actor, error) {
