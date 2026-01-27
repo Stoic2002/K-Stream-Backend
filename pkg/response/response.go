@@ -21,6 +21,7 @@ type PaginatedResponse struct {
 	Page       int         `json:"page"`
 	Limit      int         `json:"limit"`
 	TotalPages int         `json:"total_pages"`
+	HasMore    bool        `json:"has_more"`
 }
 
 // Success sends a successful response
@@ -82,6 +83,8 @@ func Paginated(c *gin.Context, items interface{}, total int64, page, limit int) 
 		totalPages++
 	}
 
+	hasMore := page < totalPages
+
 	c.JSON(http.StatusOK, Response{
 		Success: true,
 		Message: "Data retrieved successfully",
@@ -91,6 +94,7 @@ func Paginated(c *gin.Context, items interface{}, total int64, page, limit int) 
 			Page:       page,
 			Limit:      limit,
 			TotalPages: totalPages,
+			HasMore:    hasMore,
 		},
 	})
 }
