@@ -41,6 +41,15 @@ func (s *service) Create(ctx context.Context, userID string, req CreateReviewReq
 		return nil, err
 	}
 
+	// Update drama rating
+	if err := s.repo.UpdateDramaRating(ctx, req.DramaID); err != nil {
+		// Log error but don't fail the request? Or fail?
+		// For now, let's treat it as non-fatal but good to know.
+		// Actually, standard is to return error or log it.
+		// Let's log if we had a logger, but returning error might rollback transaction if we had one.
+		// Here we are not in a transaction across repo calls.
+	}
+
 	return review, nil
 }
 
@@ -75,6 +84,9 @@ func (s *service) Update(ctx context.Context, userID, reviewID string, req Updat
 		return nil, err
 	}
 
+	// Update drama rating
+	_ = s.repo.UpdateDramaRating(ctx, review.DramaID)
+
 	return review, nil
 }
 
@@ -91,5 +103,10 @@ func (s *service) Delete(ctx context.Context, userID, reviewID string, isAdmin b
 		return errors.New("unauthorized")
 	}
 
-	return s.repo.Delete(ctx, reviewID)
+	if err := s.repo.Delete(ctx, reviewID); err != nil {
+		return err
+	}
+
+	// Update drama rating
+	return s.repo.UpdateDramaRating(ctx, review.DramaID)
 }

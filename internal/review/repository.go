@@ -17,6 +17,7 @@ type Repository interface {
 	Update(ctx context.Context, review *Review) error
 	Delete(ctx context.Context, id string) error
 	FindByID(ctx context.Context, id string) (*Review, error)
+	UpdateDramaRating(ctx context.Context, dramaID string) error
 }
 
 type repository struct{}
@@ -152,5 +153,24 @@ func (r *repository) Delete(ctx context.Context, id string) error {
 		return errors.New("database not connected")
 	}
 	_, err := db.Exec(ctx, "DELETE FROM reviews WHERE id = $1", id)
+	return err
+}
+
+func (r *repository) UpdateDramaRating(ctx context.Context, dramaID string) error {
+	db := database.GetDB()
+	if db == nil {
+		return errors.New("database not connected")
+	}
+
+	query := `
+		UPDATE dramas
+		SET rating = (
+			SELECT COALESCE(AVG(rating), 0)
+			FROM reviews
+			WHERE drama_id = $1
+		)
+		WHERE id = $1
+	`
+	_, err := db.Exec(ctx, query, dramaID)
 	return err
 }
