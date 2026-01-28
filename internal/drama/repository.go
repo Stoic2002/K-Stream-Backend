@@ -12,7 +12,7 @@ import (
 )
 
 type Repository interface {
-	FindAll(ctx context.Context, page, limit int, query, genreID, status, sort string) ([]Drama, int64, error)
+	FindAll(ctx context.Context, page, limit int, query, genreID, status, sort, year string) ([]Drama, int64, error)
 	FindByID(ctx context.Context, id string) (*Drama, error)
 	Create(ctx context.Context, drama *Drama, genreIDs []string, actors []DramaActorReq, startTime time.Time) error
 	Update(ctx context.Context, drama *Drama, genreIDs []string, actors []DramaActorReq) error
@@ -25,7 +25,7 @@ func NewRepository() Repository {
 	return &repository{}
 }
 
-func (r *repository) FindAll(ctx context.Context, page, limit int, queryStr, genreID, status, sort string) ([]Drama, int64, error) {
+func (r *repository) FindAll(ctx context.Context, page, limit int, queryStr, genreID, status, sort, year string) ([]Drama, int64, error) {
 	db := database.GetDB()
 	if db == nil {
 		return nil, 0, errors.New("database not connected")
@@ -60,6 +60,17 @@ func (r *repository) FindAll(ctx context.Context, page, limit int, queryStr, gen
 		sql += filter
 		countSql += filter
 		args = append(args, status)
+		argId++
+	}
+
+	if year != "" {
+		filter := fmt.Sprintf(" AND year = $%d", argId)
+		sql += filter
+		countSql += filter
+		// Year is int in DB struct but string in query, let's parse or let driver handle it if column is int
+		// Assuming year column is int, we should probably cast or ensure year string is valid.
+		// However, postgres driver often handles string-to-int if compatible.
+		args = append(args, year)
 		argId++
 	}
 

@@ -24,8 +24,9 @@ func (h *Handler) GetAll(c *gin.Context) {
 	genreID := c.Query("genre")
 	status := c.Query("status")
 	sort := c.Query("sort")
+	year := c.Query("year")
 
-	dramas, total, err := h.service.GetAll(c.Request.Context(), page, limit, query, genreID, status, sort)
+	dramas, total, err := h.service.GetAll(c.Request.Context(), page, limit, query, genreID, status, sort, year)
 	if err != nil {
 		response.InternalError(c, "Failed to fetch dramas", err.Error())
 		return

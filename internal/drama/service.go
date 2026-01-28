@@ -7,7 +7,7 @@ import (
 )
 
 type Service interface {
-	GetAll(ctx context.Context, page, limit int, query, genreID, status, sort string) ([]Drama, int64, error)
+	GetAll(ctx context.Context, page, limit int, query, genreID, status, sort, year string) ([]Drama, int64, error)
 	GetByID(ctx context.Context, id string) (*Drama, error)
 	Create(ctx context.Context, userID string, req CreateDramaRequest) (*Drama, error)
 	Update(ctx context.Context, id string, req UpdateDramaRequest) (*Drama, error)
@@ -22,7 +22,7 @@ func NewService(repo Repository) Service {
 	return &service{repo: repo}
 }
 
-func (s *service) GetAll(ctx context.Context, page, limit int, query, genreID, status, sort string) ([]Drama, int64, error) {
+func (s *service) GetAll(ctx context.Context, page, limit int, query, genreID, status, sort, year string) ([]Drama, int64, error) {
 	if page < 1 {
 		page = 1
 	}
@@ -30,7 +30,7 @@ func (s *service) GetAll(ctx context.Context, page, limit int, query, genreID, s
 		limit = 10
 	}
 
-	return s.repo.FindAll(ctx, page, limit, query, genreID, status, sort)
+	return s.repo.FindAll(ctx, page, limit, query, genreID, status, sort, year)
 }
 
 func (s *service) GetByID(ctx context.Context, id string) (*Drama, error) {
